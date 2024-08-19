@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>States and Capitals Quiz</title>
+<link rel="stylesheet" href="style1.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
+<style>
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f0f2f5;
+  color: #333;
+  padding-top: 80px; /* Increased space for fixed header */
+}
+
+.header {
+  padding: 20px;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: #007bff;
+  color: #fff;
+  z-index: 9999;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.left-title {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.right-title {
+  font-size: 18px;
+}
+
+.header-buttons {
+  display: flex;
+  align-items: center;
+}
+
+.header-buttons button {
+  margin-left: 15px;
+  border-radius: 20px;
+}
+
+.btn-light {
+  border: 1px solid #fff;
+}
+
+.container-fluid {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.quiz-body {
+  margin-top: 20px;
+  padding-bottom: 60px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 30px;
+}
+
+.option-block-container {
+  margin-top: 20px;
+}
+
+.option-block {
+  padding: 15px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.option-block:hover {
+  background: #e2e6ea;
+  transform: scale(1.02);
+}
+
+.option-block input[type="radio"] {
+  margin-right: 10px;
+}
+
+.result-question {
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.c-wrong {
+  color: #dc3545;
+}
+
+.c-correct {
+  color: #28a745;
+}
+
+.last-row {
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+.res-header {
+  border-bottom: 2px solid #e9ecef;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  font-size: 26px;
+  font-weight: bold;
+}
+
+button {
+  border-radius: 25px;
+}
+
+.btn-success {
+  background: #28a745;
+  border-color: #28a745;
+  padding: 10px 20px;
+}
+
+.btn-success:hover {
+  background: #218838;
+  border-color: #1e7e34;
+}
+
+.form-check-label {
+  display: flex;
+  align-items: center;
+}
+
+/* Leaderboard Styles */
+.leaderboard {
+  display: none; /* Initially hidden */
+  margin-top: 40px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.leaderboard h2 {
+  margin-bottom: 20px;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 auto;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.leaderboard-table th, .leaderboard-table td {
+  padding: 12px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.leaderboard-table th {
+  background: #007bff;
+  color: #fff;
+  font-weight: bold;
+}
+
+.leaderboard-table tr:hover {
+  background: #f1f1f1;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Timer Styles */
+.timer {
+  font-size: 20px;
+  font-weight: bold;
+  color: #fff;
+  margin-left: 20px;
+}
+</style>
+</head>
+<body>
+<header class="header">
+<div class="left-title">States Quiz</div>
+<div class="header-buttons">
+  <div class="timer" id="timer">Time: 00:00</div>
+  <button class="btn btn-light" id="login-btn">Login</button>
+  <button class="btn btn-light" id="signup-btn">Signup</button>
+</div>
+<div class="right-title">Total Questions: <span id="tque"></span></div>
+</header>
+<div class="content">
+<div class="container-fluid">
+<div class="quiz-body">
+<form name="quizForm" onSubmit="">
+<fieldset class="form-group">
+<h4><span id="qid">1.</span> <span id="question"></span></h4>
+<div class="option-block-container" id="question-options">
+</div> <!-- End of option block -->
+</fieldset>
+<button name="previous" id="previous" class="btn btn-success">Previous</button>
+<button name="next" id="next" class="btn btn-success">Next</button>
+</form>
+</div>
+<!-- Leaderboard Section -->
+<div class="leaderboard" id="leaderboard">
+  <h2>Leaderboard</h2>
+  <table class="leaderboard-table" id="leaderboard-table">
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>Name</th>
+        <th>Score</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Leaderboard data will be inserted here -->
+    </tbody>
+  </table>
+</div>
+</div> <!-- End of container-fluid -->
+</div> <!-- End of content -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.min.js"></script>
+<script src="app.js"></script>
+<script>
+// JavaScript code for leaderboard and timer
+
+var leaderboardData = [
+  { name: 'Student A', score: 90 },
+  { name: 'Student B', score: 85 },
+  { name: 'Student C', score: 80 }
+];
+
+function updateLeaderboard() {
+  var tbody = $('#leaderboard-table tbody');
+  tbody.empty();
+  leaderboardData.sort(function(a, b) { return b.score - a.score; });
+  for (var i = 0; i < leaderboardData.length; i++) {
+    var student = leaderboardData[i];
+    tbody.append(
+      '<tr>' +
+      '<td>' + (i + 1) + '</td>' +
+      '<td>' + student.name + '</td>' +
+      '<td>' + student.score + '</td>' +
+      '</tr>'
+    );
+  }
+}
+
+var timer;
+var timeLeft = 300; // 5 minutes in seconds
+
+function updateTimer() {
+  var minutes = Math.floor(timeLeft / 60);
+  var seconds = timeLeft % 60;
+  $('#timer').text('Time: ' + (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds);
+  if (timeLeft <= 0) {
+    clearInterval(timer);
+    alert('Time is up!');
+    $('#next').attr('disabled', true); // Disable next button when time is up
+    endQuiz();
+  } else {
+    timeLeft--;
+  }
+}
+
+function startTimer() {
+  timer = setInterval(updateTimer, 1000);
+}
+
+function endQuiz() {
+  // Show results and leaderboard after quiz ends
+  jsq.showResult(jsq.score);
+  $('#leaderboard').show(); // Show the leaderboard section
+}
+
+var quiz = {
+"States": [
+{
+"id": 1,
+"question": "What is the capital of California?",
+"options": [
+{
+"a": "Los Angeles",
+"b": "Sacramento",
+"c": "San Francisco",
+"d": "San Diego"
+}
+],
+"answer": "Sacramento",
+"score": 0,
+"status": ""
+},
+{
+"id": 2,
+"question": "What is the capital of Texas?",
+"options": [
+{
+"a": "Dallas",
+"b": "Austin",
+"c": "Houston",
+"d": "San Antonio"
+}
+],
+"answer": "Austin",
+"score": 0,
+"status": ""
+},
+{
+"id": 3,
+"question": "What is the capital of New York?",
+"options": [
+{
+"a": "New York City",
+"b": "Albany",
+"c": "Syracuse",
+"d": "Buffalo"
+}
+],
+"answer": "Albany",
+"score": 0,
+"status": ""
+},
+]
+}
+
+var quizApp = function () {
+this.score = 0;
+this.qno = 1;
+this.currentque = 0;
+var totalque = quiz.States.length;
+this.displayQuiz = function (cque) {
+this.currentque = cque;
+if (this.currentque < totalque) {
+$("#tque").html(totalque);
+$("#previous").attr("disabled", false);
+$("#next").attr("disabled", false);
+$("#qid").html(quiz.States[this.currentque].id + '.');
+$("#question").html(quiz.States[this.currentque].question);
+$("#question-options").html("");
+for (var key in quiz.States[this.currentque].options[0]) {
+if (quiz.States[this.currentque].options[0].hasOwnProperty(key)) {
+$("#question-options").append(
+"<div class='form-check option-block'>" +
+"<label class='form-check-label'>" +
+"<input type='radio' class='form-check-input' name='option' id='q" + key + "' value='" + quiz.States[this.currentque].options[0][key] + "'><span id='optionval'>" +
+quiz.States[this.currentque].options[0][key] +
+"</span></label>"
+);
+}
+}
+}
+if (this.currentque <= 0) {
+$("#previous").attr("disabled", true);
+}
+if (this.currentque >= totalque) {
+$('#next').attr('disabled', true);
+for (var i = 0; i < totalque; i++) {
+this.score = this.score + quiz.States[i].score;
+}
+endQuiz();
+return;
+}
+}
+this.showResult = function (scr) {
+$("#result").addClass('result');
+$("#result").html("<h1 class='res-header'>Total Score: &nbsp;" + scr + '/' + totalque + "</h1>");
+for (var j = 0; j < totalque; j++) {
+var res;
+if (quiz.States[j].score == 0) {
+res = '<span class="wrong">' + quiz.States[j].score + '</span><i class="fa fa-remove c-wrong"></i>';
+} else {
+res = '<span class="correct">' + quiz.States[j].score + '</span><i class="fa fa-check c-correct"></i>';
+}
+$("#result").append(
+'<div class="result-question"><span>Q ' + quiz.States[j].id + '</span> &nbsp;' + quiz.States[j].question + '</div>' +
+'<div><b>Correct answer:</b> &nbsp;' + quiz.States[j].answer + '</div>' +
+'<div class="last-row"><b>Score:</b> &nbsp;' + res +
+'</div>'
+);
+}
+updateLeaderboard();
+}
+this.checkAnswer = function (option) {
+var answer = quiz.States[this.currentque].answer;
+option = option.replace(/</g, "&lt;") //for <
+option = option.replace(/>/g, "&gt;") //for >
+option = option.replace(/"/g, "&quot;")
+if (option == quiz.States[this.currentque].answer) {
+if (quiz.States[this.currentque].score == "") {
+quiz.States[this.currentque].score = 1;
+quiz.States[this.currentque].status = "correct";
+}
+} else {
+quiz.States[this.currentque].status = "wrong";
+}
+}
+this.changeQuestion = function (cque) {
+this.currentque = this.currentque + cque;
+this.displayQuiz(this.currentque);
+}
+}
+var jsq = new quizApp();
+var selectedopt;
+$(document).ready(function () {
+jsq.displayQuiz(0);
+startTimer();
+$('#question-options').on('change', 'input[type=radio][name=option]', function (e) {
+$(this).prop("checked", true);
+selectedopt = $(this).val();
+});
+});
+$('#next').click(function (e) {
+e.preventDefault();
+if (selectedopt) {
+jsq.checkAnswer(selectedopt);
+}
+jsq.changeQuestion(1);
+});
+$('#previous').click(function (e) {
+e.preventDefault();
+if (selectedopt) {
+jsq.checkAnswer(selectedopt);
+}
+jsq.changeQuestion(-1);
+});
+</script>
+</body>
+</html>
